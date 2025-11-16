@@ -128,8 +128,8 @@ Hardik-LMS/
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/lms
-JWT_SECRET=722930
-JWT_REFRESH_SECRET=722930
+JWT_SECRET=your-secret-key-here
+JWT_REFRESH_SECRET=your-refresh-secret-key-here
 JWT_EXPIRE=30m
 JWT_REFRESH_EXPIRE=7d
 NODE_ENV=development
