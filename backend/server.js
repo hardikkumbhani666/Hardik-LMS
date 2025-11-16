@@ -5,6 +5,10 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+// Load environment variables FIRST, before any other imports that might use them
+dotenv.config();
+
 import connectDB from './config/database.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -17,9 +21,6 @@ import userRoutes from './routes/userRoutes.js';
 import leaveRoutes from './routes/leaveRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import auditRoutes from './routes/auditRoutes.js';
-
-// Load environment variables
-dotenv.config();
 
 // Connect to database
 connectDB();
