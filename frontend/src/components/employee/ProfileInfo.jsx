@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { User, Mail, Briefcase, Calendar, Building } from 'lucide-react'
 import { userAPI } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
+import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const ProfileInfo = () => {
   const { user } = useAuth()
@@ -9,11 +11,19 @@ const ProfileInfo = () => {
   const { data: profileData } = useQuery({
     queryKey: ['profile'],
     queryFn: () => userAPI.getProfile().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'viewProfile')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: balanceData } = useQuery({
     queryKey: ['balance'],
     queryFn: () => userAPI.getBalance().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'viewBalance')
+      toast.error(errorMsg)
+    },
   })
 
   const profile = profileData?.user || user

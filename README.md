@@ -1,3 +1,43 @@
+<<<<<<< HEAD
+# 🏢 Leave Management System (LMS)
+
+A full-stack Leave Management System built with Node.js, Express, MongoDB, React, and Tailwind CSS. This system provides comprehensive leave management functionality for employees, managers, and HR personnel.
+
+## ✨ Features
+
+### 👤 Employee Features
+- Apply for leave with date range selection
+- View leave balance (Casual, Sick, Earned, Unpaid)
+- Track leave request status (Pending, Approved, Rejected)
+- Edit pending leave requests
+- Cancel pending leave requests
+- Upload medical certificates/attachments
+- View personal audit trail
+
+### 👨‍💼 Manager Features
+- Review team leave requests
+- Approve or reject leave requests
+- Bulk approve all pending leaves
+- View team members
+- View team audit trail
+- Add comments on leave decisions
+
+### 👔 HR Features
+- View all leave requests across the organization
+- Approve or reject any leave request
+- Override manager decisions
+- Manage user leave balances
+- Export reports (CSV, PDF)
+- View comprehensive analytics
+- View organization-wide audit trail
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT (JSON Web Tokens)
 # 🏢 Leave Management System (LMS)
 
 A full-stack Leave Management System built with Node.js, Express, MongoDB, React, and Tailwind CSS. This system provides comprehensive leave management functionality for employees, managers, and HR personnel.

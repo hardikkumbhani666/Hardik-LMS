@@ -27,11 +27,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Handle 401 unauthorized - redirect to login
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refreshToken')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      // Don't redirect if already on login page
+      if (!window.location.pathname.includes('/login')) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('refreshToken')
+        localStorage.removeItem('user')
+        // Show friendly message before redirect
+        if (error.response?.data?.message) {
+          // Will be handled by component
+        }
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }

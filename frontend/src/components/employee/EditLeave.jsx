@@ -5,6 +5,7 @@ import { Calendar, AlertCircle, X } from 'lucide-react'
 import { leaveAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const EditLeave = () => {
   const { id } = useParams()
@@ -15,6 +16,10 @@ const EditLeave = () => {
     queryKey: ['leave', id],
     queryFn: () => leaveAPI.getOne(id).then((res) => res.data.data),
     enabled: !!id,
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'editLeave')
+      toast.error(errorMsg)
+    },
   })
 
   const [formData, setFormData] = useState({
@@ -44,7 +49,8 @@ const EditLeave = () => {
       navigate('/employee/leaves')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not update leave request')
+      const errorMsg = getErrorMessage(error, 'employee', 'editLeave')
+      toast.error(errorMsg)
     },
   })
 

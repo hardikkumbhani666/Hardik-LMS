@@ -4,6 +4,7 @@ import { Filter, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import { leaveAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const AllLeaves = () => {
   const [filters, setFilters] = useState({ status: '', type: '', page: 1 })
@@ -15,6 +16,10 @@ const AllLeaves = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['leaves', 'hr', filters],
     queryFn: () => leaveAPI.getAll(filters).then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewAllLeaves')
+      toast.error(errorMsg)
+    },
   })
 
   const overrideMutation = useMutation({
@@ -27,7 +32,8 @@ const AllLeaves = () => {
       setAction('')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not update leave')
+      const errorMsg = getErrorMessage(error, 'hr', 'approveLeave')
+      toast.error(errorMsg)
     },
   })
 

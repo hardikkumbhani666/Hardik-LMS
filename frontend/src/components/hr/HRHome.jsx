@@ -1,21 +1,35 @@
 import { useQuery } from '@tanstack/react-query'
 import { FileText, Users, CheckCircle, Clock, BarChart3 } from 'lucide-react'
 import { leaveAPI, userAPI, reportAPI } from '../../services/api'
+import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const HRHome = () => {
   const { data: leavesData } = useQuery({
     queryKey: ['leaves', 'hr'],
     queryFn: () => leaveAPI.getAll({ limit: 10 }).then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewAllLeaves')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: usersData } = useQuery({
     queryKey: ['users'],
     queryFn: () => userAPI.getUsers().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewUsers')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: summaryData } = useQuery({
     queryKey: ['summary'],
     queryFn: () => reportAPI.getSummary().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewReports')
+      toast.error(errorMsg)
+    },
   })
 
   const stats = [

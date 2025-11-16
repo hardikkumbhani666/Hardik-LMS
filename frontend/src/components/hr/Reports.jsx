@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { BarChart3, Download, FileText } from 'lucide-react'
 import { reportAPI } from '../../services/api'
 import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const Reports = () => {
   const [filters, setFilters] = useState({
@@ -14,6 +15,10 @@ const Reports = () => {
   const { data: summaryData, isLoading } = useQuery({
     queryKey: ['summary', filters],
     queryFn: () => reportAPI.getSummary(filters).then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewReports')
+      toast.error(errorMsg)
+    },
   })
 
   const handleExport = async (type) => {
@@ -30,7 +35,8 @@ const Reports = () => {
       window.URL.revokeObjectURL(url)
       toast.success(`Report downloaded as ${type.toUpperCase()}`)
     } catch (error) {
-      toast.error('Could not export report')
+      const errorMsg = getErrorMessage(error, 'hr', 'exportReport')
+      toast.error(errorMsg)
     }
   }
 

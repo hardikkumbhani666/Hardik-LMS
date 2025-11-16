@@ -5,6 +5,7 @@ import { Calendar, FileText, AlertCircle } from 'lucide-react'
 import { leaveAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const ApplyLeave = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +38,8 @@ const ApplyLeave = () => {
       navigate('/employee/leaves')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not submit leave request')
+      const errorMsg = getErrorMessage(error, 'employee', 'applyLeave')
+      toast.error(errorMsg)
     },
   })
 

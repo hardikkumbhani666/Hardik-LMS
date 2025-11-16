@@ -18,8 +18,13 @@ import {
 import { reportAPI } from '../../services/api'
 import { format, formatDistanceToNow } from 'date-fns'
 import toast from 'react-hot-toast'
+import { useAuth } from '../../context/AuthContext'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const AuditTrail = ({ entityType, entityId, userId }) => {
+  const { user } = useAuth()
+  const role = user?.role || 'employee'
+  
   const [filters, setFilters] = useState({
     entityType: entityType || '',
     entityId: entityId || '',
@@ -44,6 +49,10 @@ const AuditTrail = ({ entityType, entityId, userId }) => {
       params.page = filters.page
       params.limit = filters.limit
       return reportAPI.getAuditLogs(params).then((res) => res.data.data)
+    },
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, role, 'viewAuditTrail')
+      toast.error(errorMsg)
     },
   })
 

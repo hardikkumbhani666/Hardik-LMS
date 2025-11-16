@@ -5,23 +5,33 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { userAPI } from '../services/api'
 import toast from 'react-hot-toast'
+import { getErrorMessage } from '../utils/errorMessages'
 
 const Header = ({ onMenuClick, showMenuButton = false }) => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
-
+  const role = user?.role || 'employee'
+  
   const { data: profileData } = useQuery({
     queryKey: ['profile'],
     queryFn: () => userAPI.getProfile().then((res) => res.data.data),
     enabled: profileOpen,
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, role, 'viewProfile')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: balanceData } = useQuery({
     queryKey: ['balance'],
     queryFn: () => userAPI.getBalance().then((res) => res.data.data),
-    enabled: profileOpen,
+    enabled: profileOpen && role === 'employee',
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, role, 'viewBalance')
+      toast.error(errorMsg)
+    },
   })
 
   useEffect(() => {

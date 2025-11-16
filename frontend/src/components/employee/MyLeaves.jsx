@@ -5,6 +5,7 @@ import { Calendar, X, Edit, Filter } from 'lucide-react'
 import { leaveAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const MyLeaves = () => {
   const [filters, setFilters] = useState({
@@ -15,9 +16,13 @@ const MyLeaves = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['leaves', 'employee', filters],
     queryFn: () => leaveAPI.getAll(filters).then((res) => res.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'viewLeaves')
+      toast.error(errorMsg)
+    },
   })
 
   const cancelMutation = useMutation({
@@ -27,7 +32,8 @@ const MyLeaves = () => {
       queryClient.invalidateQueries(['leaves'])
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not cancel leave')
+      const errorMsg = getErrorMessage(error, 'employee', 'cancelLeave')
+      toast.error(errorMsg)
     },
   })
 

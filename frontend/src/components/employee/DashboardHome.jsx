@@ -3,6 +3,8 @@ import { Calendar, Clock, CheckCircle, XCircle, TrendingUp } from 'lucide-react'
 import { userAPI, leaveAPI } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import { format } from 'date-fns'
+import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const DashboardHome = () => {
   const { user } = useAuth()
@@ -10,11 +12,19 @@ const DashboardHome = () => {
   const { data: balanceData } = useQuery({
     queryKey: ['balance'],
     queryFn: () => userAPI.getBalance().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'viewBalance')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: leavesData } = useQuery({
     queryKey: ['leaves', 'employee'],
     queryFn: () => leaveAPI.getAll({ limit: 5 }).then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'employee', 'viewLeaves')
+      toast.error(errorMsg)
+    },
   })
 
   const stats = [

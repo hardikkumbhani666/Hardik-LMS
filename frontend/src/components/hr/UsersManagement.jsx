@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Users, Edit, Calendar } from 'lucide-react'
 import { userAPI } from '../../services/api'
 import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const UsersManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null)
@@ -12,6 +13,10 @@ const UsersManagement = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['users'],
     queryFn: () => userAPI.getUsers().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'hr', 'viewUsers')
+      toast.error(errorMsg)
+    },
   })
 
   const updateBalanceMutation = useMutation({
@@ -33,7 +38,8 @@ const UsersManagement = () => {
       setBalanceData({})
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not update balance')
+      const errorMsg = getErrorMessage(error, 'hr', 'updateBalance')
+      toast.error(errorMsg)
     },
   })
 

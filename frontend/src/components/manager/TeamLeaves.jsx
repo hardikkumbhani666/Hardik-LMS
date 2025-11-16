@@ -4,16 +4,26 @@ import { CheckCircle, XCircle, MessageSquare, CheckSquare } from 'lucide-react'
 import { leaveAPI } from '../../services/api'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const TeamLeaves = () => {
   const [filters, setFilters] = useState({ status: '', type: '', page: 1 })
   const [selectedLeave, setSelectedLeave] = useState(null)
   const [comment, setComment] = useState('')
+  const [isRefetchingAfterBulkApprove, setIsRefetchingAfterBulkApprove] = useState(false)
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
     queryKey: ['leaves', 'manager', filters],
     queryFn: () => leaveAPI.getAll(filters).then((res) => res.data.data),
+    onError: (error) => {
+      // Don't show error toast if we're refetching after a successful bulk approve
+      // The bulk approve mutation will handle showing success/error messages
+      if (!isRefetchingAfterBulkApprove) {
+        const errorMsg = getErrorMessage(error, 'manager', 'viewTeamLeaves')
+        toast.error(errorMsg)
+      }
+    },
   })
 
   const approveMutation = useMutation({
@@ -25,7 +35,8 @@ const TeamLeaves = () => {
       setComment('')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not approve leave')
+      const errorMsg = getErrorMessage(error, 'manager', 'approveLeave')
+      toast.error(errorMsg)
     },
   })
 
@@ -38,7 +49,8 @@ const TeamLeaves = () => {
       setComment('')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not reject leave')
+      const errorMsg = getErrorMessage(error, 'manager', 'rejectLeave')
+      toast.error(errorMsg)
     },
   })
 
@@ -46,14 +58,36 @@ const TeamLeaves = () => {
     mutationFn: ({ leaveIds, comment }) => leaveAPI.bulkApprove({ leaveIds, comment }),
     onSuccess: (response) => {
       const { approved, failed } = response.data.data
-      toast.success(`Approved ${approved} leave${approved !== 1 ? 's' : ''}${failed > 0 ? `, ${failed} failed` : ''}`)
-      queryClient.invalidateQueries(['leaves'])
-      setSelectedLeaves([])
-      setBulkMode(false)
+      
+      // Set flag to prevent query error toast during refetch
+      setIsRefetchingAfterBulkApprove(true)
+      
+      // Show success message based on results
+      if (approved > 0 && failed === 0) {
+        toast.success(`Approved ${approved} leave${approved !== 1 ? 's' : ''}`)
+      } else if (approved > 0 && failed > 0) {
+        toast.success(`Approved ${approved} leave${approved !== 1 ? 's' : ''}, ${failed} failed`)
+      } else if (failed > 0) {
+        toast.error(`Could not approve leave requests. ${failed} failed`)
+      } else {
+        toast.success('Leave requests processed')
+      }
+      
+      // Invalidate and refetch queries
+      queryClient.invalidateQueries(['leaves']).then(() => {
+        // Reset flag after a short delay to allow refetch to complete
+        setTimeout(() => {
+          setIsRefetchingAfterBulkApprove(false)
+        }, 1000)
+      })
+      
       setComment('')
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Could not approve leaves')
+      const errorMsg = getErrorMessage(error, 'manager', 'bulkApprove')
+      toast.error(errorMsg)
+      // Reset flag on error
+      setIsRefetchingAfterBulkApprove(false)
     },
   })
 

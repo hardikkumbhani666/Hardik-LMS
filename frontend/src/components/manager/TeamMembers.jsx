@@ -1,11 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { Users, Mail, Building, Calendar } from 'lucide-react'
 import { userAPI } from '../../services/api'
+import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const TeamMembers = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['team'],
     queryFn: () => userAPI.getUsers().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'manager', 'viewTeam')
+      toast.error(errorMsg)
+    },
   })
 
   if (isLoading) {

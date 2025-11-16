@@ -110,20 +110,30 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email and password are required',
+    });
+  }
+
   // Check if user exists and get password
   const user = await User.findOne({ email }).select('+password');
   if (!user) {
-    return res.status(401).json({
+    return res.status(404).json({
       success: false,
-      message: 'Invalid email or password',
+      message: 'No account found with this email address. Please check your email or sign up.',
+      errorType: 'USER_NOT_FOUND',
     });
   }
 
   // Check if user is active
   if (!user.isActive) {
-    return res.status(401).json({
+    return res.status(403).json({
       success: false,
-      message: 'Account is deactivated. Please contact HR.',
+      message: 'Your account has been deactivated. Please contact your HR department for assistance.',
+      errorType: 'ACCOUNT_DEACTIVATED',
     });
   }
 
@@ -132,7 +142,8 @@ export const login = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     return res.status(401).json({
       success: false,
-      message: 'Invalid email or password',
+      message: 'Incorrect password. Please try again or reset your password.',
+      errorType: 'INVALID_PASSWORD',
     });
   }
 

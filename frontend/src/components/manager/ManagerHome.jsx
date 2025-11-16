@@ -2,16 +2,26 @@ import { useQuery } from '@tanstack/react-query'
 import { Users, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react'
 import { leaveAPI, userAPI } from '../../services/api'
 import { format } from 'date-fns'
+import toast from 'react-hot-toast'
+import { getErrorMessage } from '../../utils/errorMessages'
 
 const ManagerHome = () => {
   const { data: leavesData } = useQuery({
     queryKey: ['leaves', 'manager'],
     queryFn: () => leaveAPI.getAll({ status: 'pending', limit: 10 }).then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'manager', 'viewTeamLeaves')
+      toast.error(errorMsg)
+    },
   })
 
   const { data: teamData } = useQuery({
     queryKey: ['team'],
     queryFn: () => userAPI.getUsers().then((res) => res.data.data),
+    onError: (error) => {
+      const errorMsg = getErrorMessage(error, 'manager', 'viewTeam')
+      toast.error(errorMsg)
+    },
   })
 
   const stats = [
